@@ -29,9 +29,11 @@ namespace ContentWarningHax
 
         
         bool esp = true;
-        bool takeDamage = false;
+        bool takeDamage = true;
         bool infiniteStaminaEnabled = false;
         bool infiniteOxygenEnabled = false;
+        bool infjump = false;
+        //bool fullbright = false;
         bool TransformMovement = false;
         public string customText = ""; // Custom text input field
 
@@ -44,14 +46,30 @@ namespace ContentWarningHax
     
         Photon.Realtime.Player[] otherPlayers = PhotonNetwork.PlayerListOthers;
         private string lobbyInfo = ""; // String to store lobby information
+        public static GameObject c_light, c_ray;
+        private static float lastUpdateTime = 0f, updateInterval = 1f / 30f;
+        public static Player originalplayer;
+        public static CSteamID originalSteamId;
+        public static Photon.Realtime.Player RealPhotonPlayer;
+        public static CSteamID actual;
+        public static bool antiragdoll = false;
+        private static float timeSinceLastUpdate = 0.0f;
+        private static float updateInterval2 = 1f; // Update 60 times per second
+        private static float updateInterval3 = 5f;
+        private static float timeSinceLastUpdate2 = 0.0f;
+        public static bool infinitecameratime;
+        public static VideoCamera[] videoCameras;
+        private static Player[] players;
+        private static PlayerController[] playerControllers;
+        private static PlayerHandler playerHandler;
+        private static BotHandler[] botHandlers;
+        //private int selectedPlayerIndex = 0; // Tracks the currently selected player in the dropdown
+        //private List<string> playerNames = new List<string>(); // Holds the display names of the players
 
-
-        float natNextUpdateTime;
-      
-  
         public static UnityEngine.Camera cam;
-   
-        private Rect windowRect = new Rect(0, 0, 400, 400); 
+
+
+        private Rect windowRect = new Rect(0, 0, 700, 700); 
         private int tab = 0; 
         private Color backgroundColor = Color.black; 
         private bool showMenu = true;
@@ -101,8 +119,21 @@ namespace ContentWarningHax
         Vector2 scrollPosition = Vector2.zero;
         Vector2 scrollPosition1 = Vector2.zero;
 
-      
-        void MenuWindow(int windowID)
+        public static void PlayerStuff()
+        { 
+            originalplayer = Player.localPlayer;
+            if (timeSinceLastUpdate >= updateInterval2)
+            {
+                players = GameObject.FindObjectsOfType<Player>();
+                timeSinceLastUpdate = 0f;
+            }
+    timeSinceLastUpdate += Time.deltaTime;
+            if (players == null || players.Length == 0)
+            {
+                players = GameObject.FindObjectsOfType<Player>();
+            }
+}
+void MenuWindow(int windowID)
         {
             GUILayout.BeginHorizontal();
 
@@ -196,6 +227,10 @@ namespace ContentWarningHax
                         infiniteOxygenEnabled = !infiniteOxygenEnabled; // Flip the state
 
                         Player.localPlayer.data.usingOxygen = !infiniteOxygenEnabled;
+                        if (infiniteOxygenEnabled)
+                        {
+                            Player.localPlayer.data.remainingOxygen = 500f; // Access through an instance variable
+                        }
                     }
 
                     //old method for stamina
@@ -208,17 +243,78 @@ namespace ContentWarningHax
                     //string buttonText = infiniteStaminaEnabled ? "Disable Infinite Stamina" : "Enable Infinite Stamina";
                     if (GUILayout.Button(infiniteStaminaEnabled ? "Disable Inf Stamina" : "Enable Inf Stamina"))
                     {
-                        infiniteStaminaEnabled = !infiniteStaminaEnabled; // Flip the state
+                        infiniteStaminaEnabled = !infiniteStaminaEnabled;
 
-                        Player.localPlayer.data.staminaDepleated = !infiniteStaminaEnabled;
+                        if (infiniteStaminaEnabled)
+                        {
+                            Player.localPlayer.data.currentStamina = 100f; // Access through an instance variable
+                        }
                     }
 
                     // Button for toggling damage state
                     if (GUILayout.Button(takeDamage ? "Disable Damage" : "Enable Damage"))
                     {
-                        takeDamage = !takeDamage; // Toggle the state
-                        UI_Feedback.instance.TakeDamage(takeDamage);
+                        takeDamage = !takeDamage;
+
+                        if (!takeDamage)
+                        {
+                            Player.localPlayer.data.dead = false;
+                            Player.localPlayer.data.health = 100f;
+                        }
                     }
+
+
+
+                    if (GUILayout.Button(antiragdoll ? "Disable Ragdoll" : "Enable Ragdoll"))
+                    {
+                        antiragdoll = !antiragdoll;
+                        if (antiragdoll)
+                        {
+                            Player.localPlayer.refs.ragdoll.force = 0f;
+                            Player.localPlayer.refs.ragdoll.torque = 0f;
+                        }
+                    }
+
+                    if (GUILayout.Button(infjump ? "Disable Inf Jumps" : "Enable Inf Jumps"))
+                    {
+                        infjump = !infjump;
+                    }
+
+
+                    /*
+                    // Show dropdown
+                    selectedPlayerIndex = GUILayout.SelectionGrid(selectedPlayerIndex, playerNames.ToArray(), 1);
+                    // Teleport button logic
+                    if (GUILayout.Button("Teleport to Player") && playerNames.Count > 0)
+                    {
+                        // Assuming PlayerStuff is a valid method that needs to be called
+                        PlayerStuff();
+                        if (playerNames.Count != players.Length)
+                        { // Simplistic check, might need more robust logic in a real scenario
+                            playerNames.Clear();
+                            foreach (var player in players)
+                            {
+                                if (!player.IsLocal)
+                                {
+                                    playerNames.Add(player.name); // Assuming a 'name' field exists
+                                }
+                            }
+                        }
+
+                       
+
+                        // Ensure we have a valid index to avoid errors
+                        if (selectedPlayerIndex >= 0 && selectedPlayerIndex < playerNames.Count)
+                        {
+                            string selectedPlayerName = playerNames[selectedPlayerIndex];
+                            Player targetPlayer = players.FirstOrDefault(player => !player.IsLocal && player.name == selectedPlayerName);
+
+                            if (targetPlayer != null)
+                            {
+                                Player.localPlayer.transform.position = targetPlayer.transform.position; // Perform teleport
+                            }
+                        }
+                    }*/
 
 
                     GUILayout.EndVertical();
@@ -495,7 +591,8 @@ namespace ContentWarningHax
                 GUILayout.Label("Credits:");
                 GUILayout.Label("Sinnisterly (added things)- https://github.com/Sinnisterly ");
                 GUILayout.Label("WoodgamerHD (for base/source)- https://github.com/WoodgamerHD ");
-                GUILayout.EndVertical();
+                GUILayout.Label("cfemen (helped fix things) ");
+                    GUILayout.EndVertical();
                 break;
             }
 
@@ -553,7 +650,7 @@ namespace ContentWarningHax
                 // Set the background color
                 GUI.backgroundColor = backgroundColor;
 
-                windowRect = GUI.Window(0, windowRect, MenuWindow, "WoodSDK - edited @ Sinnisterly"); // Create the window with title "Menu"
+                windowRect = GUI.Window(0, windowRect, MenuWindow, "Content Warning Cheat"); // Create the window with title "Menu"
              
                 
             }
@@ -650,23 +747,14 @@ namespace ContentWarningHax
                 showMenu = !showMenu;
             }
 
-
-            natNextUpdateTime += Time.deltaTime;
-
-            if (natNextUpdateTime >= 1f)
+            if (infjump)
             {
-
-
-                PlayerController = Resources.FindObjectsOfTypeAll<Player>().ToList();
-                Room = Resources.FindObjectsOfTypeAll<Room>().ToList();
-              
-                otherPlayers =  PhotonNetwork.PlayerListOthers;
-              
-              
-                natNextUpdateTime = 0f;
+                // Continuously apply these conditions as long as infjump is true
+                // This ensures that they are not overwritten by other game logic
+                Player.localPlayer.data.sinceGrounded = 0.4f;
+                Player.localPlayer.data.sinceJump = 0.7f;
             }
 
-          
             if (TransformMovement)
             {
 
