@@ -10,6 +10,7 @@
 ## Acknowledgements
 
  - [WoodgamerHD for base](https://github.com/WoodgamerHD/Content-Warning-Cheat)
+ - cfemen for helping fix some things
 
 
 ## Features
