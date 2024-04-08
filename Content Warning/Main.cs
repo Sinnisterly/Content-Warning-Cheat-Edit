@@ -16,6 +16,7 @@ using Photon.Realtime;
 using static UnityEngine.EventSystems.EventTrigger;
 using static Photon.Voice.WebRTCAudioLib;
 using ExitGames.Client.Photon;
+using Zorro.Core.CLI;
 
 
 namespace ContentWarningHax
@@ -23,17 +24,10 @@ namespace ContentWarningHax
 
     class Main : MonoBehaviour
     {
-        //not working dev console. Doesn't hurt anything either though.
-        public static bool developerConsoleEnabled
-        {
-            [MethodImpl(MethodImplOptions.InternalCall)]
-            get;
-            [MethodImpl(MethodImplOptions.InternalCall)]
-            set;
-        }
 
 
 
+        
         bool esp = true;
         bool TransformMovement = false;
         public string customText = ""; // Custom text input field
@@ -170,6 +164,7 @@ namespace ContentWarningHax
 
                         Player.localPlayer.CallRevive();
                     }
+
                    
 
                     if (GUILayout.Button("Recharge Battery"))
@@ -195,7 +190,8 @@ namespace ContentWarningHax
                     {
                         Player.localPlayer.data.staminaDepleated = false;
                     }
-
+                   
+                   
 
 
                     GUILayout.EndVertical();
@@ -203,22 +199,7 @@ namespace ContentWarningHax
                     GUILayout.Space(10);
 
                     GUILayout.BeginVertical();
-                    if (GUILayout.Button("Dump items"))
-                    {
-
-
-                        string FilePath = "Items.txt";
-
-                        foreach (var Items in ItemDatabase.Instance.lastLoadedItems)
-                        {
-
-                            string ItemInformation;
-                            ItemInformation = "Name: " + Items.name;
-                            ItemInformation += "\t | ID: " + Items.id;
-                            File.AppendAllText(FilePath, ItemInformation + "\n");
-                        }
-
-                    }
+                    
                   
                     if (GUILayout.Button("Fake Fail Quota"))
                     {
@@ -242,6 +223,23 @@ namespace ContentWarningHax
                             PlayerHandler.instance.playerAlive[i].Die();
                         }
                     }
+
+                    if (GUILayout.Button("Open Console"))
+                    {
+                        foreach (DebugUIHandler item in FindObjectsOfType<DebugUIHandler>())
+                        {
+                            item.Show();
+                        }
+                    }
+
+                    if (GUILayout.Button("Close Console"))
+                    {
+                        foreach (DebugUIHandler item in FindObjectsOfType<DebugUIHandler>())
+                        {
+                            item.Hide();
+                        }
+                    }
+                    
                     GUILayout.EndVertical();
 
                     GUILayout.EndHorizontal();
@@ -256,7 +254,7 @@ namespace ContentWarningHax
 
                     GUILayout.BeginHorizontal();
                     GUILayout.BeginVertical();
-                    esp = GUILayout.Toggle(esp, "Esp");
+                    esp = GUILayout.Toggle(esp, "ESP");
                  
     
 
@@ -285,8 +283,23 @@ namespace ContentWarningHax
                 case 2:
                     // Items content
                     GUILayout.BeginVertical(GUI.skin.box);
+                    if (GUILayout.Button("Dump items (do 1st)"))
+                    {
 
-                 
+
+                        string FilePath = "Items.txt";
+
+                        foreach (var Items in ItemDatabase.Instance.lastLoadedItems)
+                        {
+
+                            string ItemInformation;
+                            ItemInformation = "Name: " + Items.name;
+                            ItemInformation += "\t | ID: " + Items.id;
+                            File.AppendAllText(FilePath, ItemInformation + "\n");
+                        }
+
+                    }
+
 
                     scrollPosition = GUILayout.BeginScrollView(scrollPosition);
 
@@ -591,9 +604,8 @@ namespace ContentWarningHax
         {
             // Center the window on the screen
             windowRect.x = (Screen.width - windowRect.width) / 2;
-            windowRect.y = (Screen.height - windowRect.height) / 2;
-            // Attempt to enable the developer console. !NOT WORKING! but doesn't effect anything
-            developerConsoleEnabled = true;
+            windowRect.y = (Screen.height - windowRect.height) / 2;           
+
 
 
         }
