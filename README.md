@@ -15,11 +15,12 @@
 
 
 ## Features
-
+SOME FEATURES NEED TO BE ENABLED IN THE UNDER AREA, NOT AT HOME, TEST IT
 - ESP
 - God Mode
 - Infinite Oxygen
-- Infinite Sprint (temp broken)
+- Infinite Sprint
+- Infinite Jump
 - NoClip
 - Item Spawner
 - Monster Spawner
@@ -44,9 +45,8 @@
 ## Installation
 
 Option 1:
-Get the "Inject.bat" From @WoodgamerHD's original repo releases and build the cheat.
 ```bash
-  just run Inject.bat to inject the cheat
+  just run the game, then run Inject.bat to inject the cheat
 ```
 Option 2: 
 ```bash
