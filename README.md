@@ -2,6 +2,7 @@
 # Content Warning Cheat (EDIT)
 
 - A cheat for the game Content Warning.
+  ![Logo](https://i.imgur.com/uiVi7TI.png)
   
 ![Static Badge](https://img.shields.io/badge/Unity-Cheat-red?style=flat-square&logo=Unity) 
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
