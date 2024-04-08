@@ -29,6 +29,9 @@ namespace ContentWarningHax
 
         
         bool esp = true;
+        bool takeDamage = false;
+        bool infiniteStaminaEnabled = false;
+        bool infiniteOxygenEnabled = false;
         bool TransformMovement = false;
         public string customText = ""; // Custom text input field
 
@@ -181,17 +184,41 @@ namespace ContentWarningHax
                         }
                     }
 
-                   if (GUILayout.Button("Infinite Oxygen"))
+                    //old method for oxygen
+                    /*if (GUILayout.Button("Infinite Oxygen"))
+                     {
+                         Player.localPlayer.data.usingOxygen = false;
+                     }*/
+
+                    //string buttonText = infiniteOxygenEnabled ? "Disable Infinite Oxygen" : "Enable Infinite Oxygen";
+                    if (GUILayout.Button(infiniteOxygenEnabled ? "Disable Inf Oxygen" : "Enable Inf Oxygen"))
                     {
-                        Player.localPlayer.data.usingOxygen = false;
+                        infiniteOxygenEnabled = !infiniteOxygenEnabled; // Flip the state
+
+                        Player.localPlayer.data.usingOxygen = !infiniteOxygenEnabled;
                     }
 
-                    if (GUILayout.Button("Infinite Stamina"))
+                    //old method for stamina
+                    /* if (GUILayout.Button("Infinite Stamina"))
+                     {
+                         Player.localPlayer.data.staminaDepleated = false;
+                     }*/
+
+
+                    //string buttonText = infiniteStaminaEnabled ? "Disable Infinite Stamina" : "Enable Infinite Stamina";
+                    if (GUILayout.Button(infiniteStaminaEnabled ? "Disable Inf Stamina" : "Enable Inf Stamina"))
                     {
-                        Player.localPlayer.data.staminaDepleated = false;
+                        infiniteStaminaEnabled = !infiniteStaminaEnabled; // Flip the state
+
+                        Player.localPlayer.data.staminaDepleated = !infiniteStaminaEnabled;
                     }
-                   
-                   
+
+                    // Button for toggling damage state
+                    if (GUILayout.Button(takeDamage ? "Disable Damage" : "Enable Damage"))
+                    {
+                        takeDamage = !takeDamage; // Toggle the state
+                        UI_Feedback.instance.TakeDamage(takeDamage);
+                    }
 
 
                     GUILayout.EndVertical();
